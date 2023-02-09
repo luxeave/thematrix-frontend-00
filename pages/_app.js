@@ -1,11 +1,11 @@
 import '../styles/globals.css'
-import { SessionProvider } from 'next-auth/react'
+import Layout from '@/src/components/layout/layout';
 
 function MyApp({ Component, pageProps }) {
   return (
-    <SessionProvider session={pageProps.session}>
+    <Layout>
       <Component {...pageProps} />
-    </SessionProvider>
+    </Layout>
   )
 }
 

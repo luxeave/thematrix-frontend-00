@@ -1,17 +1,18 @@
 import styles from '@/styles/Form.module.css'
 import { HiAtSymbol, HiFingerPrint } from 'react-icons/hi'
 import { useState } from 'react'
-
 import { useFormik } from 'formik';
 import LoginValidate from '@/src/lib/login_validate';
-import { signIn} from 'next-auth/react';
 import { useRouter } from 'next/router';
+import FetchAPI from '@/src/lib/fetch_api';
+import Cookies from 'js-cookie'
 
 export const LoginForm = () => {
 
-    // to switch between hidden-password-view and text-view
-    const [show, setShow] = useState(false)
-    const router = useRouter()
+    const [show, setShow] = useState(false);
+    const [submitError, setError] = useState("");
+    const router = useRouter();
+
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -22,25 +23,32 @@ export const LoginForm = () => {
     })
 
     async function onSubmit(values){       
-        try {
-            const status = await signIn('credentials', {
-                redirect: false,
-                email: values.email,
-                password: values.password,
-                callbackUrl: '/'
-            })
+        try {     
+            const payload = {
+                "username": values.email,
+                "password": values.password
+            };
 
-            if (status.ok){
-                router.push(status.url)
+            const result = await FetchAPI(process.env.LOGIN_URL, payload);
+
+            console.log(result);
+
+            if (result.statusCode!=200) {
+                Cookies.remove('username');
+                setError(result.message);
+            } else if (result.statusCode==200) {
+                Cookies.set('username', values.email);
+                setError("");
+                router.push('/');
             }
         } catch (error) {
-            console.log(error);
+            setError(error);
         }
     }
 
     return (
-        <section className="w-1/2 mx-auto flex-col gap-10">
-            <div className='title'>
+        <section className="w-500 mx-auto flex-col gap-10">
+            <div className='title text-center'>
                 <h1 className='block w-700 text-gray-800 text-4xl font-bold py-10'>Login</h1>
             </div>
 
@@ -83,6 +91,13 @@ export const LoginForm = () => {
                 </div>
             </form>
             {/* bottom */}
+
+            <div className='flex flex-col gap-5 mt-10'>             
+                <div className='flex justify-center'>
+                    { submitError!="" ? <span className='text-gray-500'>{submitError}</span> : <></>}
+                </div>   
+            </div>
+            
         </section>       
     );
 }

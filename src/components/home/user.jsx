@@ -3,11 +3,11 @@ import { MatrixForm } from '@/src/components/matrix/matrix-form'
 export const User = ({session, handleSignOut}) => {
 
     return (
-        <main className="container mx-auto text-center py-20">
+        <main className="container mx-auto text-center py-10">
             <h3 className="text-2xl font-bold">Authorized User's Page</h3>
               
             <div className='details'>
-              <h5>{session.user.email}</h5>
+              <h5>{session}</h5>
             </div>
     
             <MatrixForm />

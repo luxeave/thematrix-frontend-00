@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export const Guest = () => {
     return (
         <main className="container mx-auto text-center py-20">

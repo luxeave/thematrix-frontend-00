@@ -3,6 +3,7 @@ import { HiAtSymbol, HiFingerPrint } from 'react-icons/hi'
 import { useState } from 'react'
 import { useFormik } from 'formik';
 import MatrixValidate from '@/src/lib/matrix_validate';
+import FetchAPI from '@/src/lib/fetch_api';
 
 export const MatrixForm = () => {
 
@@ -15,25 +16,6 @@ export const MatrixForm = () => {
         validate: MatrixValidate,
         onSubmit: onSubmit
     })
-
-    async function fetchMatrix(url, payload){
-
-        console.log(url);
-
-        try {
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-            
-            return await res.json();
-        } catch (error) {
-            throw new Error(error);
-        }
-    }
 
     function parseMatrixResponse(response) {
         try {                                
@@ -53,11 +35,8 @@ export const MatrixForm = () => {
                 "matrix": values.matrix,
                 "target": values.target
             };
-
-            console.log(payload);
-            console.log(process.env.NEXT_PUBLIC_MATRIX_URL)
             
-            const result = await fetchMatrix(process.env.NEXT_PUBLIC_MATRIX_URL, payload);
+            const result = await FetchAPI(process.env.MATRIX_URL, payload);
             const parsed = parseMatrixResponse(result);
 
             setComputed(parsed);
@@ -67,7 +46,7 @@ export const MatrixForm = () => {
     }
 
     return (
-        <section className="w-1/2 mx-auto flex-col gap-10">
+        <section className="w-3/5 mx-auto flex-col gap-10">
             {/* Login Form */}
             <form className='flex flex-col my-5 gap-5' onSubmit={formik.handleSubmit}>
                 <div className={`${styles.input_group} ${formik.errors.matrix && formik.touched.matrix ? 'border-rose-600' : ''}`}>
